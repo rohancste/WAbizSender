@@ -1,0 +1,7 @@
+### Implementation Roadmap
+- Step 1: Set up a Python virtual environment and requirements.txt (Flask, requests, gspread, etc.).
+- Step 2: Implement WhatsApp API integration in sender.py (authentication, send message endpoint).
+- Step 3: Create webhook server in webhook.py to receive and process incoming WhatsApp messages.
+- Step 4: Implement Google Sheets/Baserow sync in google_sync.py .
+- Step 5: Define message templates in templates.py for COD confirmation and promo messages.
+- Step 6: Build the main workflow in main.py to fetch orders, send messages, and update statuses.
