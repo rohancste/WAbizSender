@@ -1,0 +1,121 @@
+**CRM WhatsApp Notification Bot (WAHA) - Overview & Instructions**
+
+---
+
+### 🌟 Objective:
+Create a bot that automatically sends **CRM caller assignment summaries** and eventually **daily call analytics** to internal WhatsApp groups using the **WAHA API**.
+
+---
+### 👨‍📋 Use Case:
+- Used internally by CSTE International.
+- Sends assignment summaries to the group: `120363418230720597@g.us` (Giant Leap group).
+- Used during Hiring, CRM, and other workflows.
+
+---
+
+### 🔄 Project Relationship:
+- **NOT** part of the IndiaMART bot.
+- **YES**, it belongs to the **WABizSender** project.
+- WAHA API will be used for internal notifications.
+
+---
+
+### ✅ Phase 1: Caller Assignment Notifications
+Each day, send a message like the following to the WhatsApp group:
+
+```
+Calls assigned Komal
+- Total Calls - 157
+- Fresh - 52
+- Abandoned - 50
+- CNP - 54
+- Follow up - 01
+- NDR - 0
+
+Calls assigned Deepasha
+- Total Calls - 164
+- Fresh - 51
+- Abandoned - 50
+- CNP - 41
+- Follow up - 10
+- NDR - 2
+```
+
+---
+
+### 🔧 What the Bot Needs to Do:
+
+1. **Input CRM data** (from Google Sheet, Baserow, etc.):
+```json
+[
+  {
+    "name": "Komal",
+    "total": 157,
+    "fresh": 52,
+    "abandoned": 50,
+    "cnp": 54,
+    "follow_up": 1,
+    "ndr": 0
+  },
+  {
+    "name": "Deepasha",
+    "total": 164,
+    "fresh": 51,
+    "abandoned": 50,
+    "cnp": 41,
+    "follow_up": 10,
+    "ndr": 2
+  }
+]
+```
+
+2. **Format a readable WhatsApp message** as shown above.
+3. **Send it using WAHA** to the specified group.
+
+---
+
+### 🔢 Tech Notes:
+- WAHA session must be active and part of the WhatsApp group.
+- `enhanced_sender.py` is the script used to send messages.
+- This message should be sent once per day — ideally after call assignment.
+
+---
+
+### 🔄 Future Phase: Analytics (Daily Summary)
+Later, you will extend the bot to send:
+- Total calls made
+- Confirmed COD
+- Cancelled
+- Not Reachable, etc.
+
+Format Example:
+```
+📊 Daily Call Summary - 1st May
+- Total Calls Made: 105
+- Confirmed COD: 72
+- Cancelled: 13
+- Not Reachable: 20
+➡️ Good job team! ✅
+```
+
+---
+
+### 🚀 Summary of Status:
+| Task                                    | Status       |
+|-----------------------------------------|--------------|
+| WAHA session working                    | ✅ Done      |
+| enhanced_sender.py sends messages       | ✅ Done      |
+| Format CRM data into summary message    | ✅ In progress |
+| Send message to group correctly         | ✅ In progress |
+| Analytics summary messaging             | ⏳ Planned    |
+
+---
+
+Feel free to reuse, share, or present this doc to anyone who needs to understand the internal CRM notification system via WAHA bot.
+
+---
+
+Prepared for: **Rohan**  
+Project: **WABizSender**  
+By: **ChatGPT Assistant**
+

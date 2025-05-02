@@ -11,8 +11,9 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # --- Configuration ---
-SPREADSHEET_ID = '1ZkTB3ahmrQ2-7rz-h1RdkOMPSHmkAhpFJIH64Ca0jxk'
-ORDERS_SHEET_NAME = 'Orders'
+# SPREADSHEET_ID = '1ZkTB3ahmrQ2-7rz-h1RdkOMPSHmkAhpFJIH64Ca0jxk'  # Original spreadsheet ID (commented out)
+SPREADSHEET_ID = '1fRyGTX55EQwrQv7Lwakh1sNhnG8hg5yDjvuWw_dJqbk'  # Fake spreadsheet for testing
+ORDERS_SHEET_NAME = 'Sheet1'
 REPORT_SHEET_NAME = 'Stakeholder Report'
 SETTINGS_FILE = 'settings.yaml'  # Changed from '../settings.yaml' to 'settings.yaml'
 SERVICE_ACCOUNT_FILE = 'carbon-pride-374002-2dc0cf329724.json'
@@ -207,18 +208,18 @@ def distribute_and_report():
     settings = load_settings(SETTINGS_FILE)
     if not settings or 'stakeholders' not in settings:
         logger.error("Failed to load stakeholders. Aborting.")
-        return
+        return None
 
     stakeholder_list = settings['stakeholders']
     if not stakeholder_list:
         logger.error("Stakeholder list is empty. Aborting.")
-        return
+        return None
     logger.info(f"Loaded {len(stakeholder_list)} stakeholders.")
 
     service = authenticate_google_sheets()
     if not service:
         logger.error("Authentication failed. Aborting script.")
-        return
+        return None
     sheet = service.spreadsheets()
 
     try:
@@ -231,13 +232,13 @@ def distribute_and_report():
 
         if not values:
             logger.warning(f"No data found in '{ORDERS_SHEET_NAME}'.")
-            return
+            return None
 
         logger.info(f"Read {len(values)} rows from '{ORDERS_SHEET_NAME}'.")
 
         if len(values) < DATA_START_ROW_INDEX + 1:
              logger.error(f"Not enough rows in '{ORDERS_SHEET_NAME}'. Need at least {DATA_START_ROW_INDEX + 1}. Found {len(values)}.")
-             return
+             return None
 
         header = [str(h).strip() if h is not None else '' for h in values[HEADER_ROW_INDEX]]
         header_length = len(header)
@@ -285,7 +286,7 @@ def distribute_and_report():
 
         if not filtered_indices:
             logger.info("No rows matched filter criteria. Skipping assignments and report.")
-            return
+            return None
         else:
             # --- Assign Date and Stakeholder ---
             today_date_str_for_sheet = datetime.date.today().strftime("%d-%b-%Y") # Use YYYY for consistency with example
@@ -504,14 +505,14 @@ def distribute_and_report():
                           except Exception as create_err:
                                logger.error(f"Error creating sheet '{REPORT_SHEET_NAME}': {create_err}")
                                logger.error("Cannot proceed with report. Aborting.")
-                               return
+                               return None
 
                      else:
                          logger.error(f"API Error while checking/reading sheet for append: {e}")
                          raise
                 except Exception as e:
                      logger.exception(f"Unexpected error while finding last row:")
-                     return
+                     return None
 
                 if formatted_report_values:
                     body = {'values': formatted_report_values}
@@ -529,12 +530,30 @@ def distribute_and_report():
                 else:
                      logger.warning("No report data to write.")
 
-        logger.info("Script finished execution.")
+            # Convert report_counts to a list format for returning
+            stakeholder_report = []
+            for stakeholder, counts in report_counts.items():
+                stakeholder_data = {
+                    "name": stakeholder,
+                    "total": counts["Total"],
+                    "fresh": counts["Fresh"],
+                    "abandoned": counts["Abandoned"],
+                    "invalid_fake": counts["Invalid/Fake"],
+                    "cnp": counts["CNP"],
+                    "follow_up": counts["Follow up"],
+                    "ndr": counts["NDR"]
+                }
+                stakeholder_report.append(stakeholder_data)
+            
+            logger.info("Script finished execution.")
+            return stakeholder_report
 
     except HttpError as err:
         logger.error(f"Google Sheets API Error during main execution: {err}")
+        return None
     except Exception as e:
         logger.exception("Unexpected error during main execution:")
+        return None
 
 # --- Main Execution ---
 if __name__ == '__main__':
