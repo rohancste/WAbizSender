@@ -8,6 +8,7 @@ plan1
 structure
 # C extensions
 *.so
+plan
 
 # Distribution / packaging
 .Python
@@ -175,8 +176,4 @@ cython_debug/
 .ruff_cache/
 
 # PyPI configuration file
-<<<<<<< HEAD
 .pypirc
-=======
-.pypirc
->>>>>>> ef9c3f6 (WIP: local changes before rebase)
